@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Flaxia, Flaxia Crowd, and Flaxia Auth developer documentation." />
+    <title>Flaxia Developer Docs</title>
+    <style>
+      :root {
+        --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+        --font-display: "Noto Sans JP", "Hiragino Sans", "Yu Gothic UI", system-ui, sans-serif;
+        --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8fafc;
+        --bg-hover: rgba(15, 23, 42, 0.045);
+        --border: #e2e8f0;
+        --border-strong: #cbd5e1;
+        --text-primary: #0f172a;
+        --text-muted: #64748b;
+        --accent: #22c55e;
+        --accent-dark: #16a34a;
+        --accent-text: #4ade80;
+        --danger-text: #dc2626;
+      }
+      [data-theme='dark'] {
+        --bg-primary: #181d28;
+        --bg-secondary: #212736;
+        --bg-hover: rgba(255, 255, 255, 0.075);
+        --border: #2e374d;
+        --border-strong: #3d4966;
+        --text-primary: #f8fafc;
+        --text-muted: #94a3b8;
+        --accent: #22c55e;
+        --accent-dark: #16a34a;
+        --accent-text: #4ade80;
+        --danger-text: #fca5a5;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; font-family: var(--font-sans); color: var(--text-primary); background: var(--bg-primary); line-height: 1.7; }
+      .legal-page { min-height: 100vh; background: var(--bg-primary); padding: 2rem 1rem; }
+      .legal-content-wrapper { margin: 0 auto; }
+      .legal-header { margin-bottom: 2rem; text-align: center; }
+      .legal-wordmark { font-family: var(--font-mono); color: var(--accent-text); font-size: 1.5rem; font-weight: bold; text-decoration: none; cursor: pointer; }
+      .legal-wordmark:hover { opacity: 0.8; }
+      .legal-content { background: var(--bg-primary); }
+      .legal-body { color: var(--text-primary); line-height: 1.7; }
+      .legal-body h1 { color: var(--text-primary); font-size: 1.5rem; font-weight: 600; margin: 2rem 0 1rem 0; font-family: var(--font-display); }
+      .legal-body h2 { color: var(--text-primary); font-size: 1.25rem; font-weight: 600; margin: 1.5rem 0 0.75rem 0; font-family: var(--font-display); }
+      .legal-body h3 { color: var(--text-primary); font-size: 1.125rem; font-weight: 600; margin: 1.25rem 0 0.5rem 0; font-family: var(--font-display); }
+      .legal-body h4, .legal-body h5, .legal-body h6 { color: var(--text-primary); font-weight: 600; margin: 1rem 0 0.5rem 0; font-family: var(--font-display); }
+      .legal-body p { color: var(--text-primary); margin-bottom: 1rem; font-family: var(--font-sans); }
+      .legal-body ul, .legal-body ol { margin: 1rem 0; padding-left: 1.5rem; color: var(--text-primary); }
+      .legal-body li { margin-bottom: 0.5rem; font-family: var(--font-sans); }
+      .legal-body a { color: var(--accent-text); text-decoration: underline; }
+      .legal-body a:hover { color: var(--accent-dark); }
+      .legal-body code { background: var(--bg-secondary); padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-family: var(--font-mono); font-size: 0.875em; color: var(--accent-dark); }
+      .legal-body pre { background: var(--bg-secondary); padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin: 1rem 0; border: 1px solid var(--border); }
+      .legal-body pre code { background: transparent; padding: 0; border-radius: 0; font-size: 0.875rem; color: var(--text-primary); }
+      .legal-body blockquote { margin: 1rem 0; padding: 0.5rem 1rem; border-left: 3px solid var(--border-strong); color: var(--text-muted); }
+      .legal-body table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 0.5rem; overflow: hidden; font-size: 0.9rem; }
+      .legal-body th { background: var(--bg-secondary); padding: 0.75rem 1rem; text-align: left; font-weight: 600; color: var(--text-primary); border-bottom: 1px solid var(--border); }
+      .legal-body td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); color: var(--text-primary); }
+      .legal-body tr:last-child td { border-bottom: none; }
+      .legal-body img { max-width: 100%; height: auto; }
+      .legal-error { color: var(--danger-text); text-align: center; padding: 2rem; font-family: var(--font-mono); }
+      .legal-footer { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); text-align: center; }
+      .legal-footer-links { display: flex; justify-content: center; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+      .legal-footer-link { color: var(--text-muted); text-decoration: none; font-size: 0.875rem; font-family: var(--font-mono); transition: color 0.2s ease; }
+      .legal-footer-link:hover { color: var(--accent-text); text-decoration: underline; }
+      .legal-footer-separator { color: var(--text-muted); font-size: 0.875rem; font-family: var(--font-mono); }
+      .docs-layout { display: flex; align-items: flex-start; gap: 2.5rem; }
+      .docs-nav { width: 300px; flex: 0 0 300px; }
+      .docs-section + .docs-section { margin-top: 1.5rem; }
+      .docs-section-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 0.75rem; font-family: var(--font-mono); }
+      .docs-group + .docs-group { margin-top: 1rem; }
+      .docs-group-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+      .docs-list { display: flex; flex-direction: column; gap: 0.5rem; }
+      .docs-list-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        padding: 0.65rem 0.85rem;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border);
+        border-radius: 0.5rem;
+        color: var(--text-primary);
+        text-decoration: none;
+        transition: background 0.2s ease, border-color 0.2s ease;
+      }
+      .docs-list-item:hover { background: var(--bg-hover); border-color: var(--accent); }
+      .docs-list-item.active { background: var(--bg-hover); border-color: var(--accent); }
+      .docs-list-item.active .docs-list-title { color: var(--accent-dark); }
+      .docs-list-title { font-family: var(--font-sans); font-size: 0.92rem; font-weight: 600; color: var(--text-primary); }
+      .docs-list-arrow { color: var(--text-muted); font-size: 0.9rem; font-family: var(--font-mono); }
+      .docs-layout .legal-body { flex: 1; min-width: 0; }
+      .docs-loading { color: var(--text-muted); padding: 2rem 0; }
+      @media (max-width: 900px) {
+        .docs-layout { flex-direction: column; }
+        .docs-nav { width: auto; flex: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="legal-page">
+      <div class="legal-content-wrapper">
+        <header class="legal-header">
+          <a class="legal-wordmark" href="./">Flaxia Developer Docs</a>
+        </header>
+        <main class="legal-content">
+          <div class="docs-layout">
+            <nav class="docs-nav" id="doc-nav" aria-label="Developer docs"></nav>
+            <div class="legal-body docs-article-body" id="doc-panel">
+              <div id="doc-content" class="docs-article"><div class="docs-loading">Loading…</div></div>
+            </div>
+          </div>
+        </main>
+        <footer class="legal-footer">
+          <div class="legal-footer-links">
+            <a class="legal-footer-link" href="https://flaxia.app">flaxia.app</a>
+            <span class="legal-footer-separator">|</span>
+            <a class="legal-footer-link" href="https://github.com/TeamFlaxia/flaxia">GitHub</a>
+          </div>
+        </footer>
+      </div>
+    </div>
+    <script src="vendor/markdown-it.min.js"></script>
+    <script src="vendor/purify.min.js"></script>
+    <script>
+      const ALLOWED_TAGS = [
+        'h1','h2','h3','h4','h5','h6','p','br','strong','em','code','pre','blockquote',
+        'hr','ul','ol','li','a','span','table','thead','tbody','tr','td','th','s','del','img',
+      ];
+      const ALLOWED_ATTR = ['href','target','rel','class','src','alt','title','colspan','rowspan'];
+
+      const md = window.markdownit({ html: false, xhtmlOut: false, breaks: true, linkify: false, typographer: true });
+
+      let MANIFEST = { docs: [] };
+      let currentDocId = null;
+
+      function normalize(path) {
+        const parts = [];
+        for (const part of path.split('/')) {
+          if (part === '' || part === '.') continue;
+          if (part === '..') parts.pop();
+          else parts.push(part);
+        }
+        return parts.join('/');
+      }
+
+      function dirname(path) {
+        const index = path.lastIndexOf('/');
+        return index === -1 ? '' : path.slice(0, index);
+      }
+
+      function buildNav() {
+        const nav = document.getElementById('doc-nav');
+        const sections = new Map();
+        for (const doc of MANIFEST.docs) {
+          if (!sections.has(doc.section)) sections.set(doc.section, new Map());
+          const groups = sections.get(doc.section);
+          if (!groups.has(doc.group)) groups.set(doc.group, []);
+          groups.get(doc.group).push(doc);
+        }
+
+        for (const [section, groups] of sections) {
+          const sectionEl = document.createElement('div');
+          sectionEl.className = 'docs-section';
+          const titleEl = document.createElement('div');
+          titleEl.className = 'docs-section-title';
+          titleEl.textContent = section;
+          sectionEl.appendChild(titleEl);
+
+          for (const [group, docs] of groups) {
+            const groupEl = document.createElement('div');
+            groupEl.className = 'docs-group';
+            const groupTitle = document.createElement('div');
+            groupTitle.className = 'docs-group-title';
+            groupTitle.textContent = group;
+            groupEl.appendChild(groupTitle);
+
+            const list = document.createElement('div');
+            list.className = 'docs-list';
+            for (const doc of docs) {
+              const item = document.createElement('a');
+              item.className = 'docs-list-item';
+              item.href = `#${doc.id}`;
+              item.dataset.doc = doc.id;
+              const title = document.createElement('span');
+              title.className = 'docs-list-title';
+              title.textContent = doc.title;
+              const arrow = document.createElement('span');
+              arrow.className = 'docs-list-arrow';
+              arrow.textContent = '→';
+              item.appendChild(title);
+              item.appendChild(arrow);
+              item.addEventListener('click', (event) => {
+                event.preventDefault();
+                show(doc.id);
+              });
+              list.appendChild(item);
+            }
+            groupEl.appendChild(list);
+            sectionEl.appendChild(groupEl);
+          }
+          nav.appendChild(sectionEl);
+        }
+      }
+
+      function setActiveNav(docId) {
+        for (const item of document.querySelectorAll('.docs-list-item')) {
+          item.classList.toggle('active', item.dataset.doc === docId);
+        }
+      }
+
+      function fixLinks(container, doc) {
+        const bySource = new Map(MANIFEST.docs.map((entry) => [entry.source, entry]));
+        for (const anchor of container.querySelectorAll('a[href]')) {
+          const href = anchor.getAttribute('href');
+          if (!href || href.startsWith('#') || /^(https?:)?\/\//.test(href) || href.startsWith('mailto:')) continue;
+          const hashIndex = href.indexOf('#');
+          const path = hashIndex === -1 ? href : href.slice(0, hashIndex);
+          const hash = hashIndex === -1 ? '' : href.slice(hashIndex + 1);
+          if (!path) continue;
+          const resolved = normalize(`${dirname(doc.source)}/${path}`);
+          const target = bySource.get(resolved);
+          if (target) {
+            anchor.setAttribute('href', `#${target.id}`);
+            anchor.setAttribute('data-doc', target.id);
+            anchor.addEventListener('click', (event) => {
+              event.preventDefault();
+              show(target.id);
+            });
+          } else {
+            anchor.setAttribute('href', `https://github.com/${doc.repo}/blob/main/${resolved}${hash ? `#${hash}` : ''}`);
+            anchor.setAttribute('target', '_blank');
+            anchor.setAttribute('rel', 'noopener noreferrer');
+          }
+        }
+      }
+
+      async function show(docId) {
+        const doc = MANIFEST.docs.find((entry) => entry.id === docId);
+        const container = document.getElementById('doc-content');
+        if (!doc) {
+          container.innerHTML = '<div class="legal-error">Document not found.</div>';
+          return;
+        }
+        currentDocId = docId;
+        setActiveNav(docId);
+        container.innerHTML = '<div class="docs-loading">Loading…</div>';
+        try {
+          const response = await fetch(`docs/${doc.file}`);
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const markdown = await response.text();
+          const html = md.render(markdown);
+          const clean = window.DOMPurify.sanitize(html, {
+            ALLOWED_TAGS,
+            ALLOWED_ATTR,
+            ALLOW_DATA_ATTR: false,
+          });
+          container.innerHTML = clean;
+          fixLinks(container, doc);
+          document.title = `${doc.title} — Flaxia Developer Docs`;
+        } catch (error) {
+          container.innerHTML = `<div class="legal-error">Failed to load document: ${error.message}</div>`;
+        }
+      }
+
+      async function init() {
+        try {
+          const response = await fetch('docs/index.json');
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          MANIFEST = await response.json();
+        } catch (error) {
+          document.getElementById('doc-content').innerHTML =
+            `<div class="legal-error">Failed to load manifest: ${error.message}</div>`;
+          return;
+        }
+        buildNav();
+        const initial = window.location.hash.slice(1) || MANIFEST.docs[0]?.id;
+        if (initial) show(initial);
+      }
+
+      init();
+    </script>
+  </body>
+</html>

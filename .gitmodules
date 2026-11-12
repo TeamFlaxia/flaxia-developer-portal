@@ -1,0 +1,9 @@
+[submodule "flaxia"]
+	path = flaxia
+	url = https://github.com/TeamFlaxia/flaxia.git
+[submodule "flaxia-crowd"]
+	path = flaxia-crowd
+	url = https://github.com/TeamFlaxia/flaxia-crowd.git
+[submodule "flaxia-auth"]
+	path = flaxia-auth
+	url = https://github.com/TeamFlaxia/flaxia-auth.git
