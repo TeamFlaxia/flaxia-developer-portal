@@ -6,6 +6,8 @@
  * scripts/build.mjs. Internal engineering docs are intentionally not listed.
  */
 
+export const SITE_BASE = 'https://flaxia-developer.pages.dev';
+
 export const REPOS = {
   flaxia: 'TeamFlaxia/flaxia',
   'flaxia-crowd': 'TeamFlaxia/flaxia-crowd',

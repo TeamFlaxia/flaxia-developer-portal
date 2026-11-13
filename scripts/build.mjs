@@ -1,6 +1,6 @@
 import { copyFileSync, cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { DOCS, REPOS } from '../docs.config.mjs';
+import { DOCS, REPOS, SITE_BASE } from '../docs.config.mjs';
 
 /**
  * Assembles dist/ for Cloudflare Pages:
@@ -8,6 +8,7 @@ import { DOCS, REPOS } from '../docs.config.mjs';
  *   dist/vendor/         — markdown-it + DOMPurify
  *   dist/docs/<path>     — referenced docs copied from the submodules
  *   dist/docs/index.json — navigation manifest
+ *   dist/llms.txt        — raw-markdown URL list for AI models
  *
  * Run from the dev/ directory: node scripts/build.mjs
  */
@@ -52,4 +53,31 @@ for (const [repo, source, dest, section, group] of DOCS) {
 }
 
 writeFileSync(join(distDir, 'docs', 'index.json'), `${JSON.stringify({ docs }, null, 2)}\n`, 'utf8');
+
+const llmsLines = [
+  '# Flaxia Developer Docs',
+  '',
+  '> Developer documentation for Flaxia, Flaxia Crowd, and Flaxia Auth.',
+  '> This file lists the raw Markdown source of every published document.',
+  '> AI models and agents should fetch these URLs directly instead of rendering the HTML site.',
+  '',
+];
+let currentSection = null;
+let currentGroup = null;
+for (const doc of docs) {
+  if (doc.section !== currentSection) {
+    currentSection = doc.section;
+    currentGroup = null;
+    if (llmsLines[llmsLines.length - 1] !== '') llmsLines.push('');
+    llmsLines.push(`## ${doc.section}`, '');
+  }
+  if (doc.group !== currentGroup) {
+    currentGroup = doc.group;
+    if (llmsLines[llmsLines.length - 1] !== '') llmsLines.push('');
+    llmsLines.push(`### ${doc.group}`, '');
+  }
+  llmsLines.push(`- [${doc.title}](${SITE_BASE}/docs/${doc.file})`);
+}
+llmsLines.push('');
+writeFileSync(join(distDir, 'llms.txt'), llmsLines.join('\n'), 'utf8');
 console.log(`Built dist/ (${docs.length} docs)`);

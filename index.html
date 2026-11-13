@@ -95,6 +95,18 @@
       .docs-list-arrow { color: var(--text-muted); font-size: 0.9rem; font-family: var(--font-mono); }
       .docs-layout .legal-body { flex: 1; min-width: 0; }
       .docs-loading { color: var(--text-muted); padding: 2rem 0; }
+      .intro-ai-note { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem; }
+      .intro-ai-note code { background: var(--bg-secondary); padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-family: var(--font-mono); font-size: 0.85em; }
+      .intro-copy-btn { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--bg-secondary); border: 1px solid var(--border-strong); color: var(--text-primary); border-radius: 0.375rem; padding: 0.35rem 0.75rem; font-size: 0.85rem; font-family: var(--font-mono); cursor: pointer; transition: border-color 0.2s ease; margin-bottom: 1rem; }
+      .intro-copy-btn:hover { border-color: var(--accent); }
+      .intro-group + .intro-group { margin-top: 0.75rem; }
+      .intro-group-title { font-size: 0.85rem; color: var(--text-muted); margin: 0.75rem 0 0.25rem; }
+      .intro-md-list { list-style: none; margin: 0.25rem 0 0; padding: 0; }
+      .intro-md-item { padding: 0.4rem 0; border-bottom: 1px solid var(--border); }
+      .intro-md-item:last-child { border-bottom: none; }
+      .intro-md-title { display: block; font-size: 0.92rem; font-weight: 600; }
+      .intro-md-url { display: block; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); word-break: break-all; text-decoration: none; }
+      a.intro-md-url:hover { color: var(--accent-text); text-decoration: underline; }
       @media (max-width: 900px) {
         .docs-layout { flex-direction: column; }
         .docs-nav { width: auto; flex: none; }
@@ -105,7 +117,7 @@
     <div class="legal-page">
       <div class="legal-content-wrapper">
         <header class="legal-header">
-          <a class="legal-wordmark" href="./">Flaxia Developer Docs</a>
+          <a class="legal-wordmark" href="#intro">Flaxia Developer Docs</a>
         </header>
         <main class="legal-content">
           <div class="docs-layout">
@@ -135,8 +147,22 @@
 
       const md = window.markdownit({ html: false, xhtmlOut: false, breaks: true, linkify: false, typographer: true });
 
+      const INTRO_ID = 'intro';
       let MANIFEST = { docs: [] };
       let currentDocId = null;
+
+      function escapeHtml(value) {
+        return String(value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function rawMarkdownUrl(doc) {
+        return `${window.location.origin}/docs/${doc.file}`;
+      }
 
       function normalize(path) {
         const parts = [];
@@ -162,6 +188,19 @@
           if (!groups.has(doc.group)) groups.set(doc.group, []);
           groups.get(doc.group).push(doc);
         }
+
+        const introSection = document.createElement('div');
+        introSection.className = 'docs-section';
+        const introList = document.createElement('div');
+        introList.className = 'docs-list';
+        const introItem = document.createElement('a');
+        introItem.className = 'docs-list-item';
+        introItem.href = `#${INTRO_ID}`;
+        introItem.dataset.doc = INTRO_ID;
+        introItem.innerHTML = '<span class="docs-list-title">初めに</span><span class="docs-list-arrow">→</span>';
+        introList.appendChild(introItem);
+        introSection.appendChild(introList);
+        nav.appendChild(introSection);
 
         for (const [section, groups] of sections) {
           const sectionEl = document.createElement('div');
@@ -194,10 +233,6 @@
               arrow.textContent = '→';
               item.appendChild(title);
               item.appendChild(arrow);
-              item.addEventListener('click', (event) => {
-                event.preventDefault();
-                show(doc.id);
-              });
               list.appendChild(item);
             }
             groupEl.appendChild(list);
@@ -227,16 +262,62 @@
           if (target) {
             anchor.setAttribute('href', `#${target.id}`);
             anchor.setAttribute('data-doc', target.id);
-            anchor.addEventListener('click', (event) => {
-              event.preventDefault();
-              show(target.id);
-            });
           } else {
             anchor.setAttribute('href', `https://github.com/${doc.repo}/blob/main/${resolved}${hash ? `#${hash}` : ''}`);
             anchor.setAttribute('target', '_blank');
             anchor.setAttribute('rel', 'noopener noreferrer');
           }
         }
+      }
+
+      function showIntro() {
+        currentDocId = INTRO_ID;
+        setActiveNav(INTRO_ID);
+        document.title = '初めに — Flaxia Developer Docs';
+        const container = document.getElementById('doc-content');
+
+        const sections = new Map();
+        for (const doc of MANIFEST.docs) {
+          if (!sections.has(doc.section)) sections.set(doc.section, new Map());
+          const groups = sections.get(doc.section);
+          if (!groups.has(doc.group)) groups.set(doc.group, []);
+          groups.get(doc.group).push(doc);
+        }
+
+        let html = `<h1>初めに</h1>
+<p>Flaxia / Flaxia Crowd / Flaxia Auth の開発者向けドキュメントです。左の一覧から各ドキュメントを読めます。</p>
+<h2>リンクの共有</h2>
+<p>このサイトの URL は常に <code>#ドキュメントID</code> 形式で現在表示中のページを指します。共有したいときは、ブラウザのアドレスバーに表示されている URL をそのままコピーしてください。</p>
+<h2>AI モデル / LLM 向け</h2>
+<p class="intro-ai-note">各ドキュメントの生の Markdown を以下の URL からそのまま取得できます。AI モデルやエージェントは HTML をレンダリングせず、これらを直接読んでください。全体の一覧は <a href="llms.txt">/llms.txt</a> からも取得できます。</p>
+<button type="button" class="intro-copy-btn" id="intro-copy-urls">URL 一覧をコピー</button>`;
+
+        for (const [section, groups] of sections) {
+          for (const [group, docs] of groups) {
+            html += `<div class="intro-group"><div class="intro-group-title">${escapeHtml(section)} · ${escapeHtml(group)}</div><ul class="intro-md-list">`;
+            for (const doc of docs) {
+              const url = rawMarkdownUrl(doc);
+              html += `<li class="intro-md-item"><a class="intro-md-title" href="#${escapeHtml(doc.id)}">${escapeHtml(doc.title)}</a><a class="intro-md-url" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a></li>`;
+            }
+            html += '</ul></div>';
+          }
+        }
+
+        container.innerHTML = html;
+
+        const copyButton = document.getElementById('intro-copy-urls');
+        copyButton.addEventListener('click', async () => {
+          const lines = MANIFEST.docs.map((doc) => `- [${doc.title}](${rawMarkdownUrl(doc)})`).join('\n');
+          try {
+            await navigator.clipboard.writeText(lines);
+            copyButton.textContent = 'コピーしました';
+          } catch {
+            copyButton.textContent = 'コピーに失敗しました';
+          }
+          window.setTimeout(() => {
+            copyButton.textContent = 'URL 一覧をコピー';
+          }, 2000);
+        });
       }
 
       async function show(docId) {
@@ -278,8 +359,17 @@
           return;
         }
         buildNav();
-        const initial = window.location.hash.slice(1) || MANIFEST.docs[0]?.id;
-        if (initial) show(initial);
+        window.addEventListener('hashchange', route);
+        route();
+      }
+
+      function route() {
+        const id = window.location.hash.slice(1);
+        if (!id || id === INTRO_ID) {
+          showIntro();
+        } else {
+          show(id);
+        }
       }
 
       init();
